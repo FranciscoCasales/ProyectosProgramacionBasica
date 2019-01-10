@@ -3,9 +3,6 @@ document.addEventListener("keyup", moverViejito);
 var vc = document.getElementById("villaCasales");
 var lienzo = vc.getContext("2d");
 
-var cViejito = document.getElementById("viejito");
-var lienzoViejito = cViejito.getContext("2d");
-
 var vaca = {
   url: "vaca.png",
   cargaOK: false
@@ -20,7 +17,8 @@ var cerdo = {
 };
 var fondo = {
   url: "tile.png",
-  cargaOK: false
+  cargaOK: false,
+  firstTime: true
 };
 var viejito = {
   url: "spritesViejito.png",
@@ -41,6 +39,9 @@ var viejito = {
   frameUp: 3,   frameDown: 0,    frameLeft: 1,  frameRight: 2
 };
 
+var posicionesx = [];
+var posicionesy = [];
+
 //##########################Dibujo del esenario##############################
 
 fondo.objeto = cargarImagen(fondo, cargarFondo);
@@ -57,43 +58,57 @@ function moverViejito(evento){
   var x_nueva = viejito.posx;
   var y_nueva = viejito.posy;
 
-  lienzoViejito.clearRect(viejito.posx, viejito.posy,
-    viejito.width, viejito.height);
-
-  viejito.currentFrame = ++viejito.currentFrame % viejito.frames;
-  viejito.posFrmx = viejito.currentFrame * viejito.width;
-
   switch(evento.keyCode){
     case viejito.UP:
-      y_nueva = viejito.posy - 1;
+      y_nueva = viejito.posy - 3;
       viejito.isUp = true;
       viejito.posFrmy = viejito.frameUp * viejito.height;
     break;
     case viejito.DOWN:
-      y_nueva = viejito.posy + 1;
+      y_nueva = viejito.posy + 3;
       viejito.isDown = true;
       viejito.posFrmy = viejito.frameDown * viejito.height;
     break;
     case viejito.RIGHT:
-      x_nueva = viejito.posx + 1;
+      x_nueva = viejito.posx + 3;
       viejito.isRight = true;
       viejito.posFrmy = viejito.frameRight * viejito.height;
     break;
     case viejito.LEFT:
-      x_nueva = viejito.posx - 1;
+      x_nueva = viejito.posx - 3;
       viejito.isLeft = true;
       viejito.posFrmy = viejito.frameLeft * viejito.height;
     break;
   }
 
+  console.log("Arriba " + viejito.isUp);
+  console.log("Abajo " + viejito.isDown);
+  console.log("Derecha " + viejito.isRight);
+  console.log("Izquierda " + viejito.isLeft);
+
+  if (viejito.isUp || viejito.isDown || viejito.isRight || viejito.isLeft)
+  {
+    lienzo.clearRect(viejito.posx, viejito.posy,
+      viejito.width, viejito.height);
+
+    viejito.currentFrame = ++viejito.currentFrame % viejito.frames;
+    viejito.posFrmx = viejito.currentFrame * viejito.width;
+  }
+
+  viejito.posx = x_nueva;
+  viejito.posy = y_nueva;
   dibujar();
 
   viejito.isUp = false;
   viejito.isDown = false;
   viejito.isRight = false;
   viejito.isLeft = false;
-  viejito.posx = x;
-  viejito.posy = y;
+
+  console.log("despues" + viejito.isUp);
+  console.log("despues" + viejito.isDown);
+  console.log("despues" + viejito.isRight);
+  console.log("despues" + viejito.isLeft);
+
 }
 
 //#######################################################################
@@ -108,28 +123,30 @@ function dibujar(){
   if (fondo.cargaOK){
     lienzo.drawImage(fondo.objeto, 0, 0);
     for(v=0;v<5;v++){
-      var x = aleatorio(2, 7);
-      var y = aleatorio(2, 7);
+      if (fondo.firstTime) {
+        posicionesx.push(aleatorio(2, 7));
+        posicionesy.push(aleatorio(2, 7));
+      }
 
       if (vaca.cargaOK) {
-        var xv = x * 60;
-        var yv = y * 60;
+        var xv = posicionesx[v] * 60;
+        var yv = posicionesy[v] * 60;
         lienzo.drawImage(vaca.objeto, xv, yv);
       }
       if (pollo.cargaOK) {
-        var xp = x * 10;
-        var yp = y * 10;
+        var xp = posicionesx[v] * 10;
+        var yp = posicionesy[v] * 10;
         lienzo.drawImage(pollo.objeto, xp, yp);
       }
       if (cerdo.cargaOK) {
-        var xc = x * 35;
-        var yc = y * 35;
+        var xc = posicionesx[v] * 35;
+        var yc = posicionesy[v] * 35;
         lienzo.drawImage(cerdo.objeto, xc, yc);
       }
     }
 
     if(viejito.cargaOK){
-      lienzoViejito.drawImage(viejito.objeto, viejito.posFrmx,viejito.posFrmy,
+      lienzo.drawImage(viejito.objeto, viejito.posFrmx,viejito.posFrmy,
         viejito.width, viejito.height, viejito.posx, viejito.posy,
         viejito.width,viejito.height);
     }
